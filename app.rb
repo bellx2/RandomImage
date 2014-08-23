@@ -1,18 +1,29 @@
 require 'sinatra'
 require 'open-uri'
-require 'flickraw'
-
-FlickRaw.api_key="42822fcc56da3103c95127a0e02032ab"
-FlickRaw.shared_secret="5db2e364816149dd"
+require 'json'
 
 get '/' do
-  # list = flickr.photos.getRecent
-  list = flickr.interestingness.getList :per_page => 50
-  idx = rand(list.count)
-  id     = list[idx].id
-  secret = list[idx].secret
-  info = flickr.photos.getInfo :photo_id => id, :secret => secret
-  url = FlickRaw.url_b(info)
+  items = getFlickrItems.sort_by{rand}
+  url = getImageURL(items[0])
   send_file(open(url),type: 'image/jpeg',disposition: 'inline')
 end
 
+get '/images' do
+  feed = Array.new
+  items = getFlickrItems.sort_by{rand}
+  10.times do |idx|
+    url = getImageURL(items[idx])
+    feed << {"url" => url}
+  end
+  feed.to_json
+end
+
+def getFlickrItems
+  uri = URI.parse('https://api.flickr.com/services/feeds/photos_public.gne?format=json&nojsoncallback=1')
+  json = Net::HTTP.get(uri)
+  JSON.parse(json)['items']
+end
+
+def getImageURL(item)
+  item['media']['m'].gsub(/_m/,'')
+end
