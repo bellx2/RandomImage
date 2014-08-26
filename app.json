@@ -2,6 +2,6 @@
   "name": "RandomImgae",
   "description": "Returns Flickr Image Randomly",
   "repository": "https://github.com/bellx2/RandomImage",
-  "logo": "",
+  "logo": "https://node-js-sample.herokuapp.com/node.svg",
   "keywords": ["sinatra", "static"]
 }
