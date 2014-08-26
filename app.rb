@@ -4,7 +4,7 @@ require 'json'
 
 get '/' do
   items = getFlickrItems.sort_by{rand}
-  url = getImageURL(items[0])
+  url = getImageInfo(items[0])['url']
   send_file(open(url),type: 'image/jpeg',disposition: 'inline')
 end
 
@@ -12,18 +12,24 @@ get '/images' do
   feed = Array.new
   items = getFlickrItems.sort_by{rand}
   10.times do |idx|
-    url = getImageURL(items[idx])
-    feed << {"url" => url}
+    info = getImageInfo(items[idx])
+    feed << info
   end
   feed.to_json
 end
 
 def getFlickrItems
-  uri = URI.parse('https://api.flickr.com/services/feeds/photos_public.gne?format=json&nojsoncallback=1')
+  # https://www.flickr.com/services/feeds/docs/photos_public/
+  tags = ['animal']
+  uri = URI.parse("https://api.flickr.com/services/feeds/photos_public.gne?format=json&tags=#{tags.join(',')}&nojsoncallback=1")
+  p uri
   json = Net::HTTP.get(uri)
   JSON.parse(json)['items']
 end
 
-def getImageURL(item)
-  item['media']['m'].gsub(/_m/,'')
+def getImageInfo(item)
+  data = Hash.new
+  data['url'] = item['media']['m'].gsub(/_m/,'')
+  data['title'] = item['title']
+  data
 end
