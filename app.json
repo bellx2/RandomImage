@@ -3,5 +3,5 @@
   "description": "Returns Flickr Image Randomly",
   "repository": "https://github.com/bellx2/RandomImage",
   "logo": "",
-  "keywords": ["node", "express", "static"]
+  "keywords": ["sinatra", "static"]
 }
